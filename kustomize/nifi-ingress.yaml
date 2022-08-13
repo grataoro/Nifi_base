@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
+      { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/group.name: internal
+    alb.ingress.kubernetes.io/group.order: "400"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/success-codes: 200-499
+    alb.ingress.kubernetes.io/target-type: ip
+    kubernetes.io/ingress.class: alb
+  name: nifi-ingress
+  namespace: data
+spec:
+  rules:
+  - host: nifi.prod.cloud.polichat.com.br
+    http:
+      paths:
+      - backend:
+          service:
+            name: nifi-svc
+            port:
+              number: 8080
+        path: /*
+        pathType: ImplementationSpecific

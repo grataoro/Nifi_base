@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+  labels:
+    io.kompose.service: nifi
+  name: nifi
+  namespace: data
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      io.kompose.service: nifi
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+      labels:
+        io.kompose.service: nifi
+    spec:
+      containers:
+      - env:
+        - name: NIFI_CLUSTER_IS_NODE
+          value: "true"
+        - name: NIFI_CLUSTER_NODE_PROTOCOL_PORT
+          value: "8082"
+        - name: NIFI_ELECTION_MAX_WAIT
+          value: 1 min
+        - name: NIFI_WEB_HTTP_PORT
+          value: "8080"
+        - name: NIFI_ZK_CONNECT_STRING
+          value: zookeeper-svc.svc:2181
+        image: 244020757792.dkr.ecr.us-east-2.amazonaws.com/infra/poli-nifi
+        imagePullPolicy: IfNotPresent
+        name: nifi-python
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /data
+          name: vol-nifi
+      dnsPolicy: ClusterFirst
+      hostname: nifi
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: vol-nifi
+        persistentVolumeClaim:
+          claimName: nifi-pvc

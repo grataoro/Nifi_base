@@ -1,0 +1,6 @@
+nifi/Auth/_data_in_my_sql.yml*
+nifi/Auth/_data_out_redshift.yml*
+nifi/Auth/env.json
+ana.json
+__pycache__
+teste*
